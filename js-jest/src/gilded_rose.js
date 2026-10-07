@@ -1,9 +1,11 @@
 const MAX_QUALITY = 50;
+const MIN_QUALITY = 0;
+const MIN_SELLIN = 0;
 
 const brie = 'Aged Brie';
 const backstage = 'Backstage passes to a TAFKAL80ETC concert';
 const sulfuras = 'Sulfuras, Hand of Ragnaros';
-const specificItems = [brie, backstage, sulfuras];
+const qualityIncreaseItems = [brie, backstage, sulfuras];
 
 class Item {
   constructor(name, sellIn, quality) {
@@ -19,18 +21,16 @@ class Shop {
   }
   increaseQuality(item) {
     if (item.quality < MAX_QUALITY) {
-      item.quality = item.quality + 1;
+      item.quality += 1;
     }
   }
   decreaseQuality(item) {
-    if (item.quality > 0 && item.name != sulfuras) {
-      item.quality = item.quality - 1;
+    if (item.quality > MIN_QUALITY) {
+      item.quality -= 1;
     }
   }
   decreaseSellIn(item) {
-    if (item.name != sulfuras) {
-      item.sellIn = item.sellIn - 1;
-    }
+    item.sellIn -= 1;
   }
   handleExpiredItem(item) {
     switch (item.name) {
@@ -38,13 +38,15 @@ class Shop {
         this.increaseQuality(item);
         break;
       case backstage:
-        item.quality = item.quality - item.quality;
+        item.quality = MIN_QUALITY;
+        break;
+      case sulfuras:
         break;
       default:
         this.decreaseQuality(item);
     }
   }
-  handleSpecialItem(item) {
+  handleQualityIncrease(item) {
     this.increaseQuality(item);
     if (item.name == backstage) {
       if (item.sellIn < 11) {
@@ -57,15 +59,15 @@ class Shop {
   }
   updateQuality() {
     for (const item of this.items) {
-      if (specificItems.includes(item.name)) {
-        this.handleSpecialItem(item);
+      if (qualityIncreaseItems.includes(item.name)) {
+        this.handleQualityIncrease(item);
       } else {
         this.decreaseQuality(item);
       }
-
-      this.decreaseSellIn(item);
-
-      if (item.sellIn < 0) {
+      if (item.name != sulfuras) {
+        this.decreaseSellIn(item);
+      }
+      if (item.sellIn < MIN_SELLIN) {
         this.handleExpiredItem(item);
       }
     }
