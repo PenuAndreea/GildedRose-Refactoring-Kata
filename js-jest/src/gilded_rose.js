@@ -23,7 +23,7 @@ class Shop {
   constructor(items = []) {
     this.items = items;
   }
-  modifyQuality(item, amount = DEFAULT_VALUE) {
+  modifyQuality(item, amount) {
     const newQuality = item.quality + amount;
 
     if (newQuality > MAX_QUALITY) {
@@ -53,7 +53,6 @@ class Shop {
   isExpired(item) {
     return item.sellIn < LAST_SELLABLE_DAY;
   }
-
   updateQuality() {
     for (const item of this.items) {
       switch (item.name) {
