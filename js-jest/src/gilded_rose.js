@@ -44,27 +44,27 @@ class Shop {
         this.decreaseQuality(item);
     }
   }
+  handleSpecialItem(item) {
+    this.increaseQuality(item);
+    if (item.name == backstage) {
+      if (item.sellIn < 11) {
+        this.increaseQuality(item);
+      }
+      if (item.sellIn < 6) {
+        this.increaseQuality(item);
+      }
+    }
+  }
   updateQuality() {
     for (const item of this.items) {
-      if (!specificItems.includes(item.name)) {
-        this.decreaseQuality(item);
+      if (specificItems.includes(item.name)) {
+        this.handleSpecialItem(item);
       } else {
-        this.increaseQuality(item);
-        if (item.name == backstage) {
-          if (item.sellIn < 11) {
-            this.increaseQuality(item);
-          }
-          if (item.sellIn < 6) {
-            this.increaseQuality(item);
-          }
-        }
+        this.decreaseQuality(item);
       }
 
-      // DECREASE SELL IN
       this.decreaseSellIn(item);
 
-
-      // SELL BY DATE HAS PASSED
       if (item.sellIn < 0) {
         this.handleExpiredItem(item);
       }
