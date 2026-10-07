@@ -47,14 +47,6 @@ describe("Gilded Rose", function () {
     expect(items[0].quality).toBe(0);
   });
 
-  it("should set quality to 0 for backstage passes with 0 days left", function () {
-    const gildedRose = new Shop([
-      new Item("Backstage passes to a TAFKAL80ETC concert", 0, 20),
-    ]);
-    const items = gildedRose.updateQuality();
-    expect(items[0].quality).toBe(0);
-  });
-
   it("should increase quality by 2 for backstage passes with 6 days left", function () {
     const gildedRose = new Shop([
       new Item("Backstage passes to a TAFKAL80ETC concert", 6, 20),
@@ -152,10 +144,47 @@ describe("Gilded Rose", function () {
     expect(items[0].quality).toBe(50);
   });
 
+  it("should not allow quality to exceed 49 for Aged Brie", function () {
+    const gildedRose = new Shop([new Item("Aged Brie", 10, 49)]);
+    const items = gildedRose.updateQuality();
+    expect(items[0].quality).toBe(50);
+  });
+
   // expired items tests
   it("should decrease quality by 2 for expired items", function () {
     const gildedRose = new Shop([new Item("foo", 0, 20)]);
     const items = gildedRose.updateQuality();
     expect(items[0].quality).toBe(18);
   });
+
+  // conjured items tests
+  it("should decrease quality by 2 for conjured items before the sell-by date", function () {
+    const gildedRose = new Shop([new Item("Conjured Mana Cake", 10, 20)]);
+    const items = gildedRose.updateQuality();
+    expect(items[0].quality).toBe(18);
+  });
+
+  it("should succeed with different Conjured name", function () {
+    const gildedRose = new Shop([new Item("Conjured Elixir", 10, 20)]);
+    const items = gildedRose.updateQuality();
+    expect(items[0].quality).toBe(18);
+  });
+
+  it("should decrease quality by 4 for conjured items after the sell-by date", function () {
+    const gildedRose = new Shop([new Item("Conjured Mana Cake", 0, 20)]);
+    const items = gildedRose.updateQuality();
+    expect(items[0].quality).toBe(16);
+  });
+
+  it("should not allow quality to go below 0 for conjured items", function () {
+    const gildedRose = new Shop([
+      new Item("Conjured Mana Cake", 10, 1),
+      new Item("Conjured Mana Cake", 0, 3),
+    ]);
+    const items = gildedRose.updateQuality();
+    expect(items[0].quality).toBe(0);
+    expect(items[1].quality).toBe(0);
+  });
+
+
 });

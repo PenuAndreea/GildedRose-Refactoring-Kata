@@ -3,13 +3,11 @@ const MIN_QUALITY = 0;
 const LAST_SELLABLE_DAY = 0;
 const BACKSTAGE_DOUBLE_VALUE_DAYS = 10;
 const BACKSTAGE_TRIPLE_VALUE_DAYS = 5;
-const DEFAULT_VALUE = 1;
-const DOUBLE_VALUE = 2;
-const TRIPLE_VALUE = 3;
 
 const brie = 'Aged Brie';
 const backstage = 'Backstage passes to a TAFKAL80ETC concert';
 const sulfuras = 'Sulfuras, Hand of Ragnaros';
+const conjured = 'Conjured';
 
 class Item {
   constructor(name, sellIn, quality) {
@@ -43,11 +41,11 @@ class Shop {
   }
   handleBackstagePasses(item) {
     if (item.sellIn <= BACKSTAGE_TRIPLE_VALUE_DAYS) {
-      this.modifyQuality(item, TRIPLE_VALUE);
+      this.modifyQuality(item, 3);
     } else if (item.sellIn <= BACKSTAGE_DOUBLE_VALUE_DAYS) {
-      this.modifyQuality(item, DOUBLE_VALUE);
+      this.modifyQuality(item, 2);
     } else {
-      this.modifyQuality(item, DEFAULT_VALUE);
+      this.modifyQuality(item, 1);
     }
   }
   isExpired(item) {
@@ -67,11 +65,18 @@ class Shop {
           break;
         case brie:
           this.decreaseSellIn(item);
-          this.modifyQuality(item, this.isExpired(item) ? DOUBLE_VALUE : DEFAULT_VALUE);
+          this.modifyQuality(item, this.isExpired(item) ? 2 : 1);
           break;
-        default:
+        default: {
+          const isConjured = item.name.includes(conjured);
+          const qualityDecrease = isConjured ? 2 : 1;
           this.decreaseSellIn(item);
-          this.modifyQuality(item, this.isExpired(item) ? -DOUBLE_VALUE : -DEFAULT_VALUE);
+
+          const expired = this.isExpired(item);
+          const qualityChange = -(expired ? qualityDecrease * 2 : qualityDecrease);
+
+          this.modifyQuality(item, qualityChange);
+        }
       }
     }
 
