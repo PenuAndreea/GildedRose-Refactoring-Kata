@@ -1,6 +1,6 @@
 const MAX_QUALITY = 50;
 const MIN_QUALITY = 0;
-const SELLIN_THRESHOLD = 0;
+const LAST_SELLABLE_DAY = 0;
 
 const brie = 'Aged Brie';
 const backstage = 'Backstage passes to a TAFKAL80ETC concert';
@@ -31,18 +31,6 @@ class Shop {
   decreaseSellIn(item) {
     item.sellIn -= 1;
   }
-  handleExpiredItem(item) {
-    switch (item.name) {
-      case brie:
-        this.increaseQuality(item);
-        break;
-      case backstage:
-        item.quality = MIN_QUALITY;
-        break;
-      default:
-        this.decreaseQuality(item);
-    }
-  }
   handleBackstagePasses(item) {
     this.increaseQuality(item);
     if (item.sellIn < 11) {
@@ -52,26 +40,35 @@ class Shop {
       this.increaseQuality(item);
     }
   }
+  isExpiredItem(item) {
+    return item.sellIn < LAST_SELLABLE_DAY;
+  }
 
   updateQuality() {
     for (const item of this.items) {
       switch (item.name) {
         case backstage:
           this.handleBackstagePasses(item);
+          this.decreaseSellIn(item);
+          if (this.isExpiredItem(item)) {
+            item.quality = MIN_QUALITY;
+          }
           break;
         case sulfuras:
+          break;
         case brie:
           this.increaseQuality(item);
+          this.decreaseSellIn(item);
+          if (this.isExpiredItem(item)) {
+            this.increaseQuality(item);
+          }
           break;
         default:
           this.decreaseQuality(item);
-      }
-
-      if (item.name != sulfuras) {
-        this.decreaseSellIn(item);
-        if (item.sellIn < SELLIN_THRESHOLD) {
-          this.handleExpiredItem(item);
-        }
+          this.decreaseSellIn(item);
+          if (this.isExpiredItem(item)) {
+            this.decreaseQuality(item);
+          }
       }
     }
 
