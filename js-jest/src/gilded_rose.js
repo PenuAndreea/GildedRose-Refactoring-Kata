@@ -46,21 +46,26 @@ class Shop {
         this.decreaseQuality(item);
     }
   }
-  handleQualityIncrease(item) {
+  handleBackstagePasses(item) {
     this.increaseQuality(item);
-    if (item.name == backstage) {
-      if (item.sellIn < 11) {
-        this.increaseQuality(item);
-      }
-      if (item.sellIn < 6) {
-        this.increaseQuality(item);
-      }
+    if (item.sellIn < 11) {
+      this.increaseQuality(item);
+    }
+    if (item.sellIn < 6) {
+      this.increaseQuality(item);
     }
   }
+
   updateQuality() {
     for (const item of this.items) {
       if (qualityIncreaseItems.includes(item.name)) {
-        this.handleQualityIncrease(item);
+        switch (item.name) {
+          case backstage:
+            this.handleBackstagePasses(item);
+            break;
+          default:
+            this.increaseQuality(item);
+        }
       } else {
         this.decreaseQuality(item);
       }
