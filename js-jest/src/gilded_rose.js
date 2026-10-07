@@ -3,6 +3,7 @@ const MIN_QUALITY = 0;
 const LAST_SELLABLE_DAY = 0;
 const BACKSTAGE_DOUBLE_VALUE_DAYS = 10;
 const BACKSTAGE_TRIPLE_VALUE_DAYS = 5;
+const DEFAULT_VALUE = 1;
 const DOUBLE_VALUE = 2;
 const TRIPLE_VALUE = 3;
 
@@ -22,30 +23,31 @@ class Shop {
   constructor(items = []) {
     this.items = items;
   }
-  increaseQuality(item, amount = 1) {
-    if ((item.quality + amount) <= MAX_QUALITY) {
-      item.quality += amount;
-    } else {
+  modifyQuality(item, amount = DEFAULT_VALUE) {
+    const newQuality = item.quality + amount;
+
+    if (newQuality > MAX_QUALITY) {
       item.quality = MAX_QUALITY;
+      return;
     }
-  }
-  decreaseQuality(item, amount = 1) {
-    if ((item.quality - amount) > MIN_QUALITY) {
-      item.quality -= amount;
-    } else {
+
+    if (newQuality < MIN_QUALITY) {
       item.quality = MIN_QUALITY;
+      return;
     }
+
+    item.quality = newQuality;
   }
   decreaseSellIn(item) {
     item.sellIn -= 1;
   }
   handleBackstagePasses(item) {
     if (item.sellIn <= BACKSTAGE_TRIPLE_VALUE_DAYS) {
-      this.increaseQuality(item, TRIPLE_VALUE);
+      this.modifyQuality(item, TRIPLE_VALUE);
     } else if (item.sellIn <= BACKSTAGE_DOUBLE_VALUE_DAYS) {
-      this.increaseQuality(item, DOUBLE_VALUE);
+      this.modifyQuality(item, DOUBLE_VALUE);
     } else {
-      this.increaseQuality(item);
+      this.modifyQuality(item, DEFAULT_VALUE);
     }
   }
   isExpired(item) {
@@ -66,11 +68,11 @@ class Shop {
           break;
         case brie:
           this.decreaseSellIn(item);
-          this.increaseQuality(item, this.isExpired(item) ? DOUBLE_VALUE : undefined);
+          this.modifyQuality(item, this.isExpired(item) ? DOUBLE_VALUE : DEFAULT_VALUE);
           break;
         default:
           this.decreaseSellIn(item);
-          this.decreaseQuality(item, this.isExpired(item) ? DOUBLE_VALUE : undefined);
+          this.modifyQuality(item, this.isExpired(item) ? -DOUBLE_VALUE : -DEFAULT_VALUE);
       }
     }
 
