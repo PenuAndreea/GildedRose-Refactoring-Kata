@@ -14,6 +14,7 @@ class Shop {
     const brie = 'Aged Brie';
     const backstage = 'Backstage passes to a TAFKAL80ETC concert';
     const sulfuras = 'Sulfuras, Hand of Ragnaros';
+    const MAX_QUALITY = 50;
 
     for (const item of this.items) {
       if (item.name != brie && item.name != backstage) {
@@ -23,16 +24,16 @@ class Shop {
           }
         }
       } else {
-        if (item.quality < 50) {
+        if (item.quality < MAX_QUALITY) {
           item.quality = item.quality + 1;
           if (item.name == backstage) {
             if (item.sellIn < 11) {
-              if (item.quality < 50) {
+              if (item.quality < MAX_QUALITY) {
                 item.quality = item.quality + 1;
               }
             }
             if (item.sellIn < 6) {
-              if (item.quality < 50) {
+              if (item.quality < MAX_QUALITY) {
                 item.quality = item.quality + 1;
               }
             }
@@ -54,7 +55,7 @@ class Shop {
             item.quality = item.quality - item.quality;
           }
         } else {
-          if (item.quality < 50) {
+          if (item.quality < MAX_QUALITY) {
             item.quality = item.quality + 1;
           }
         }
