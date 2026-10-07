@@ -32,6 +32,18 @@ class Shop {
       item.sellIn = item.sellIn - 1;
     }
   }
+  handleExpiredItem(item) {
+    switch (item.name) {
+      case brie:
+        this.increaseQuality(item);
+        break;
+      case backstage:
+        item.quality = item.quality - item.quality;
+        break;
+      default:
+        this.decreaseQuality(item);
+    }
+  }
   updateQuality() {
     for (const item of this.items) {
       if (!specificItems.includes(item.name)) {
@@ -47,24 +59,14 @@ class Shop {
           }
         }
       }
-      // sulfuras does not decrease in sellIn or quality
+
       // DECREASE SELL IN
       this.decreaseSellIn(item);
 
 
       // SELL BY DATE HAS PASSED
       if (item.sellIn < 0) {
-        // BRIE AND BACKSTAGE INCREASE IN QUALITY
-        if (item.name != brie) {
-          // The quality of an item is never negative
-          if (item.name != backstage) {
-            this.decreaseQuality(item);
-          } else {
-            item.quality = item.quality - item.quality;
-          }
-        } else {
-          this.increaseQuality(item);
-        }
+        this.handleExpiredItem(item);
       }
     }
 
