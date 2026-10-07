@@ -1,8 +1,10 @@
 const MAX_QUALITY = 50;
 const MIN_QUALITY = 0;
 const LAST_SELLABLE_DAY = 0;
-const BACKSTAGE_PASS_SELL_IN_THRESHOLD = 11;
-const BACKSTAGE_PASS_SELL_IN_THRESHOLD_2 = 6;
+const BACKSTAGE_DOUBLE_VALUE_DAYS = 10;
+const BACKSTAGE_TRIPLE_VALUE_DAYS = 5;
+const DOUBLE_VALUE = 2;
+const TRIPLE_VALUE = 3;
 
 const brie = 'Aged Brie';
 const backstage = 'Backstage passes to a TAFKAL80ETC concert';
@@ -20,29 +22,33 @@ class Shop {
   constructor(items = []) {
     this.items = items;
   }
-  increaseQuality(item) {
-    if (item.quality < MAX_QUALITY) {
-      item.quality += 1;
+  increaseQuality(item, amount = 1) {
+    if ((item.quality + amount) <= MAX_QUALITY) {
+      item.quality += amount;
+    } else {
+      item.quality = MAX_QUALITY;
     }
   }
-  decreaseQuality(item) {
-    if (item.quality > MIN_QUALITY) {
-      item.quality -= 1;
+  decreaseQuality(item, amount = 1) {
+    if ((item.quality - amount) > MIN_QUALITY) {
+      item.quality -= amount;
+    } else {
+      item.quality = MIN_QUALITY;
     }
   }
   decreaseSellIn(item) {
     item.sellIn -= 1;
   }
   handleBackstagePasses(item) {
-    this.increaseQuality(item);
-    if (item.sellIn < BACKSTAGE_PASS_SELL_IN_THRESHOLD) {
-      this.increaseQuality(item);
-    }
-    if (item.sellIn < BACKSTAGE_PASS_SELL_IN_THRESHOLD_2) {
+    if (item.sellIn <= BACKSTAGE_TRIPLE_VALUE_DAYS) {
+      this.increaseQuality(item, TRIPLE_VALUE);
+    } else if (item.sellIn <= BACKSTAGE_DOUBLE_VALUE_DAYS) {
+      this.increaseQuality(item, DOUBLE_VALUE);
+    } else {
       this.increaseQuality(item);
     }
   }
-  isExpiredItem(item) {
+  isExpired(item) {
     return item.sellIn < LAST_SELLABLE_DAY;
   }
 
@@ -52,25 +58,19 @@ class Shop {
         case backstage:
           this.handleBackstagePasses(item);
           this.decreaseSellIn(item);
-          if (this.isExpiredItem(item)) {
+          if (this.isExpired(item)) {
             item.quality = MIN_QUALITY;
           }
           break;
         case sulfuras:
           break;
         case brie:
-          this.increaseQuality(item);
           this.decreaseSellIn(item);
-          if (this.isExpiredItem(item)) {
-            this.increaseQuality(item);
-          }
+          this.increaseQuality(item, this.isExpired(item) ? DOUBLE_VALUE : undefined);
           break;
         default:
-          this.decreaseQuality(item);
           this.decreaseSellIn(item);
-          if (this.isExpiredItem(item)) {
-            this.decreaseQuality(item);
-          }
+          this.decreaseQuality(item, this.isExpired(item) ? DOUBLE_VALUE : undefined);
       }
     }
 
