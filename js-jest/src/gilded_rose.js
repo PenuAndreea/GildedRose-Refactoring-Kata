@@ -1,11 +1,10 @@
 const MAX_QUALITY = 50;
 const MIN_QUALITY = 0;
-const MIN_SELLIN = 0;
+const SELLIN_THRESHOLD = 0;
 
 const brie = 'Aged Brie';
 const backstage = 'Backstage passes to a TAFKAL80ETC concert';
 const sulfuras = 'Sulfuras, Hand of Ragnaros';
-const qualityIncreaseItems = [brie, backstage, sulfuras];
 
 class Item {
   constructor(name, sellIn, quality) {
@@ -40,8 +39,6 @@ class Shop {
       case backstage:
         item.quality = MIN_QUALITY;
         break;
-      case sulfuras:
-        break;
       default:
         this.decreaseQuality(item);
     }
@@ -58,22 +55,23 @@ class Shop {
 
   updateQuality() {
     for (const item of this.items) {
-      if (qualityIncreaseItems.includes(item.name)) {
-        switch (item.name) {
-          case backstage:
-            this.handleBackstagePasses(item);
-            break;
-          default:
-            this.increaseQuality(item);
-        }
-      } else {
-        this.decreaseQuality(item);
+      switch (item.name) {
+        case backstage:
+          this.handleBackstagePasses(item);
+          break;
+        case sulfuras:
+        case brie:
+          this.increaseQuality(item);
+          break;
+        default:
+          this.decreaseQuality(item);
       }
+
       if (item.name != sulfuras) {
         this.decreaseSellIn(item);
-      }
-      if (item.sellIn < MIN_SELLIN) {
-        this.handleExpiredItem(item);
+        if (item.sellIn < SELLIN_THRESHOLD) {
+          this.handleExpiredItem(item);
+        }
       }
     }
 
