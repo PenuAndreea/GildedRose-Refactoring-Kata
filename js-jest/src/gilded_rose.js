@@ -1,6 +1,8 @@
 const MAX_QUALITY = 50;
 const MIN_QUALITY = 0;
 const LAST_SELLABLE_DAY = 0;
+const BACKSTAGE_PASS_SELL_IN_THRESHOLD = 11;
+const BACKSTAGE_PASS_SELL_IN_THRESHOLD_2 = 6;
 
 const brie = 'Aged Brie';
 const backstage = 'Backstage passes to a TAFKAL80ETC concert';
@@ -33,10 +35,10 @@ class Shop {
   }
   handleBackstagePasses(item) {
     this.increaseQuality(item);
-    if (item.sellIn < 11) {
+    if (item.sellIn < BACKSTAGE_PASS_SELL_IN_THRESHOLD) {
       this.increaseQuality(item);
     }
-    if (item.sellIn < 6) {
+    if (item.sellIn < BACKSTAGE_PASS_SELL_IN_THRESHOLD_2) {
       this.increaseQuality(item);
     }
   }
